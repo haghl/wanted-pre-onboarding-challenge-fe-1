@@ -1,4 +1,4 @@
-import { Modal, Typography } from '@mui/material'
+import { Modal, TextField } from '@mui/material'
 import { Box } from '@mui/system'
 
 interface ToDoPlusProps {
@@ -22,12 +22,27 @@ const ToDoPlus = ({ open, onClose }: ToDoPlusProps) => {
           p: 4,
         }}
       >
-        <Typography id="modal-modal-title" variant="h6" component="h2">
-          Text in a modal
-        </Typography>
-        <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-          Duis mollis, est non commodo luctus, nisi erat porttitor ligula.
-        </Typography>
+        <TextField
+          margin="normal"
+          fullWidth
+          id="title"
+          label="ToDo 제목"
+          name="title"
+          autoFocus
+          autoComplete="off"
+          // value={userEmail}
+          // onChange={onChangeEmail}
+        />
+        <TextField
+          margin="normal"
+          fullWidth
+          id="title"
+          label="ToDo 제목"
+          name="title"
+          autoComplete="off"
+          // value={userEmail}
+          // onChange={onChangeEmail}
+        />
       </Box>
     </Modal>
   )
