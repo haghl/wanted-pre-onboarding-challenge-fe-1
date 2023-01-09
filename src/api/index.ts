@@ -41,3 +41,12 @@ export const postCreateToDo = (data: TodoProp) => {
   }
   return API.post(url, data, config)
 }
+
+// todo 수정
+export const postEditToDo = (data: TodoProp, id) => {
+  const url = `/todos/${id}`
+  const config = {
+    headers,
+  }
+  return API.put(url, data, config)
+}
