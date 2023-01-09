@@ -8,7 +8,7 @@ interface ToDoPlusProps {
   open: boolean
   onClose: (bool: boolean) => void
   type: 'plus' | 'edit'
-  editType?: EditProp
+  editType?: EditProp | null
 }
 
 const ToDoPlus = ({ open, onClose, type, editType }: ToDoPlusProps) => {
@@ -33,7 +33,7 @@ const ToDoPlus = ({ open, onClose, type, editType }: ToDoPlusProps) => {
   const onClickEdit = useCallback(async () => {
     if (editData?.title !== title || editData?.content !== contents) {
       try {
-        await postEditToDo({ title, content: contents }, editData?.id)
+        await postEditToDo({ title, content: contents }, editData!.id)
         onClose(false)
       } catch (err) {
         console.log('수정 오류', err)
@@ -48,9 +48,10 @@ const ToDoPlus = ({ open, onClose, type, editType }: ToDoPlusProps) => {
       setTitle(editData?.title)
       setContents(editData?.content)
     }
+
     return () => {
       setTodoType('plus')
-      setEditData()
+      setEditData(undefined)
     }
   }, [])
 

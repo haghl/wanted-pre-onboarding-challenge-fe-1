@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useState } from 'react'
-import { getToDoList, TodoProp } from '@/api'
+import { deleteTodo, getToDoList, TodoProp } from '@/api'
 import { Accordion, AccordionDetails, AccordionSummary, AppBar, Box, Button, Container, CssBaseline, List, ListItem, ListItemText, Toolbar, Typography, Grid } from '@mui/material'
 import moment from 'moment'
-import { useNavigate } from 'react-router-dom'
 import ToDoPlus from '@/components/ToDoPlus'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import { useNavigate } from 'react-router-dom'
 
 type TodoListProp = { title: string; content: string; id: string; createdAt: string; updatedAt: string }
 type TodoType = 'plus' | 'edit'
@@ -35,6 +35,23 @@ const Home = () => {
     setTodoPlus(true)
   }, [])
 
+  // 삭제하기
+  const onClickDelete = useCallback(async (id: string) => {
+    try {
+      await deleteTodo(id)
+      alert('삭제되었습니다.')
+      getList()
+    } catch (err) {
+      console.log('수정 오류', err)
+    }
+  }, [])
+
+  // 로그 아웃
+  const onClickLogOut = useCallback(() => {
+    localStorage.removeItem('accessToken')
+    navigate('/login')
+  }, [])
+
   // 마운트 시 데이터 불러오기
   useEffect(() => {
     if (!todoPlus) getList()
@@ -59,8 +76,8 @@ const Home = () => {
               >
                 생성
               </Button>
-              <Button color="inherit" onClick={() => navigate('/login')}>
-                Login
+              <Button color="inherit" onClick={onClickLogOut}>
+                LogOut
               </Button>
             </Box>
           </Toolbar>
@@ -80,7 +97,7 @@ const Home = () => {
                         <Typography>생성일 : {moment(x.createdAt).format('YYYY.MM.DD')}</Typography>
                         <Grid marginTop="30px" justifyContent="flex-end">
                           <Button onClick={() => onClickEdit({ title: x.title, content: x.content, id: x.id })}>수정</Button>
-                          <Button>삭제</Button>
+                          <Button onClick={() => onClickDelete(x.id)}>삭제</Button>
                         </Grid>
                       </AccordionDetails>
                     </Accordion>
@@ -98,7 +115,7 @@ const Home = () => {
           </Box>
         </Container>
       </Box>
-      <ToDoPlus open={todoPlus} type={todoType} onClose={() => setTodoPlus(false)} editType={editTodoData} />
+      {todoPlus && <ToDoPlus open={todoPlus} type={todoType} onClose={() => setTodoPlus(false)} editType={editTodoData} />}
     </>
   )
 }
