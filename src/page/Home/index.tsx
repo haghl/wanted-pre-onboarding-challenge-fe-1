@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useState } from 'react'
-import { deleteTodo, getToDoList, TodoProp } from '@/api'
+import { useLoaderData, useNavigate } from 'react-router-dom'
 import { Accordion, AccordionDetails, AccordionSummary, AppBar, Box, Button, Container, CssBaseline, List, ListItem, ListItemText, Toolbar, Typography, Grid } from '@mui/material'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import moment from 'moment'
 import ToDoPlus from '@/components/ToDoPlus'
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import { useNavigate } from 'react-router-dom'
+import { deleteTodo, getToDoList, TodoProp } from '@/api'
 
 type TodoListProp = { title: string; content: string; id: string; createdAt: string; updatedAt: string }
 type TodoType = 'plus' | 'edit'
@@ -12,6 +12,7 @@ export type EditProp = TodoProp & { id: string }
 
 const Home = () => {
   const navigate = useNavigate()
+  // const listData = useRouteLoaderData('home')
   const [todoList, setTodoList] = useState<TodoListProp[]>([])
   const [todoPlus, setTodoPlus] = useState(false)
   const [todoType, setTodoType] = useState<TodoType>('plus')
@@ -19,13 +20,9 @@ const Home = () => {
 
   // 데이터 불러오기 함수
   const getList = useCallback(async () => {
-    try {
-      const res = await getToDoList()
-      console.log('데이터', res.data.data)
-      setTodoList(res.data.data.reverse())
-    } catch (err) {
-      console.log('목록 불러오기 실패', err)
-    }
+    const res = await getToDoList()
+    console.log('데이터', res.data.data)
+    setTodoList(res.data.data.reverse())
   }, [])
 
   // 수정
@@ -55,6 +52,7 @@ const Home = () => {
   // 마운트 시 데이터 불러오기
   useEffect(() => {
     if (!todoPlus) getList()
+    // console.log(listData)
   }, [todoPlus])
 
   return (
@@ -84,23 +82,26 @@ const Home = () => {
         </AppBar>
         <Container component="main" sx={{ mb: 4 }}>
           <Box>
-            <List dense={true} sx={{ width: '100%', margin: '5px auto 0', bgcolor: 'background.paper' }}>
+            <List dense sx={{ width: '100%', margin: '5px auto 0', bgcolor: 'background.paper' }}>
               {todoList.length > 0 ? (
                 todoList.map((x) => {
                   return (
-                    <Accordion key={x.id} sx={{ width: '100%', minHeight: 50 }}>
-                      <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id="panel1a-header">
-                        <Typography>{x.title}</Typography>
-                      </AccordionSummary>
-                      <AccordionDetails>
-                        <Typography>{x.content}</Typography>
-                        <Typography>생성일 : {moment(x.createdAt).format('YYYY.MM.DD')}</Typography>
-                        <Grid marginTop="30px" justifyContent="flex-end">
-                          <Button onClick={() => onClickEdit({ title: x.title, content: x.content, id: x.id })}>수정</Button>
-                          <Button onClick={() => onClickDelete(x.id)}>삭제</Button>
-                        </Grid>
-                      </AccordionDetails>
-                    </Accordion>
+                    // <Accordion key={x.id} sx={{ width: '100%', minHeight: 50 }}>
+                    //   <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id="panel1a-header">
+                    //     <Typography>{x.title}</Typography>
+                    //   </AccordionSummary>
+                    //   <AccordionDetails>
+                    //     <Typography>{x.content}</Typography>
+                    //     <Typography>생성일 : {moment(x.createdAt).format('YYYY.MM.DD')}</Typography>
+                    //     <Grid marginTop="30px" justifyContent="flex-end">
+                    //       <Button onClick={() => onClickEdit({ title: x.title, content: x.content, id: x.id })}>수정</Button>
+                    //       <Button onClick={() => onClickDelete(x.id)}>삭제</Button>
+                    //     </Grid>
+                    //   </AccordionDetails>
+                    // </Accordion>
+                    <ListItem key={x.id} sx={{ width: '100%', minHeight: 50 }}>
+                      <ListItemText>{x.title}</ListItemText>
+                    </ListItem>
                   )
                 })
               ) : (

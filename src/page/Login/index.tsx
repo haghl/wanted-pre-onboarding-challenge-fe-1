@@ -1,9 +1,10 @@
+import { Container, ThemeProvider } from '@mui/system'
 import { ChangeEvent, FormEvent, useCallback, useState } from 'react'
+import { Navigate, useNavigate } from 'react-router-dom'
 import { Avatar, Box, Button, createTheme, CssBaseline, Grid, Link, TextField, Typography } from '@mui/material'
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
-import { Container, ThemeProvider } from '@mui/system'
 import { postLogin, UserProp } from '@/api'
-import { useNavigate } from 'react-router-dom'
+import isLogin from '@/utils/isLogin'
 
 const Login = () => {
   const theme = createTheme()
@@ -17,7 +18,7 @@ const Login = () => {
 
   // 이메일 입력
   const onChangeEmail = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-    const REG_EMAIL = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/
+    const REG_EMAIL = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/i
 
     setUserEmail(e.target.value)
     if (!REG_EMAIL.test(e.target.value) && e.target.value !== '') {
@@ -67,6 +68,8 @@ const Login = () => {
     },
     [userEmail, userPw, errTxt]
   )
+
+  if (isLogin) return <Navigate to="/" />
 
   return (
     <ThemeProvider theme={theme}>

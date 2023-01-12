@@ -31,6 +31,15 @@ export const getToDoList = () => {
   return API.get(url, config)
 }
 
+// 투두 상세
+export const getToDoDetail = (id: string) => {
+  const url = `/todos/:${id}`
+  const config = {
+    headers,
+  }
+  return API.get(url, config)
+}
+
 export type TodoProp = { title: string; content: string }
 
 // todo 생성

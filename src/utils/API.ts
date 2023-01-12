@@ -1,4 +1,5 @@
 import axios from 'axios'
+import router from '@/router'
 
 // API 인스턴스 생성
 const API = axios.create({
@@ -28,6 +29,17 @@ API.interceptors.request.use(
   },
   (err) => {
     console.log('api보낼거 오류', err.response.data)
+    return Promise.reject(err)
+  }
+)
+
+API.interceptors.response.use(
+  (res) => {
+    return res.data
+  },
+  (err) => {
+    alert(`오류발생! ${err.response.data.details}`)
+    if (err.response.status === 400) router.navigate('/login', { replace: true })
     return Promise.reject(err)
   }
 )

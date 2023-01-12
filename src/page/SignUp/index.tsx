@@ -2,8 +2,9 @@ import { ChangeEvent, FormEvent, useCallback, useState } from 'react'
 import { Avatar, Box, Button, createTheme, CssBaseline, TextField, Typography } from '@mui/material'
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd'
 import { Container, ThemeProvider } from '@mui/system'
-import { useNavigate } from 'react-router-dom'
+import { Navigate, useNavigate } from 'react-router-dom'
 import { postSignUp, type UserProp } from '@/api'
+import isLogin from '@/utils/isLogin'
 
 const SignUp = () => {
   const theme = createTheme()
@@ -19,7 +20,7 @@ const SignUp = () => {
 
   // 이메일 입력
   const onChangeEmail = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-    const REG_EMAIL = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/
+    const REG_EMAIL = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/i
 
     setUserEmail(e.target.value)
     if (!REG_EMAIL.test(e.target.value) && e.target.value !== '') {
@@ -84,6 +85,7 @@ const SignUp = () => {
     [userEmail, userPw, userPwChk, errTxt]
   )
 
+  if (isLogin) return <Navigate to="/" />
   return (
     <ThemeProvider theme={theme}>
       <Container component="main" maxWidth="xs">
