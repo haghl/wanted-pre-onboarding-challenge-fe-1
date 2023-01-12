@@ -1,5 +1,5 @@
 import axios from 'axios'
-import router from '@/router'
+import router from '@/router/router'
 
 // API 인스턴스 생성
 const API = axios.create({
@@ -12,14 +12,16 @@ API.interceptors.request.use(
     const accessToken = localStorage.getItem('accessToken')
     const data = config
 
-    if (!accessToken || accessToken === 'undefined') {
+    if (accessToken || accessToken !== 'undefined') {
       // eslint-disable-next-line no-param-reassign
       data.headers = {
         Accept: '*/*',
+        'Content-Type': 'application/json',
       }
     } else {
       // eslint-disable-next-line no-param-reassign
       data.headers = {
+        'Content-Type': 'application/json',
         Authorization: `Bearer ${accessToken}`,
         Accept: '*/*',
       }
