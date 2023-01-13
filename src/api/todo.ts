@@ -1,4 +1,4 @@
-import { ITodoProps } from '@/types/todo'
+import { ITodoInputProps } from '@/types/todo'
 import API from '@/utils/API'
 
 const TodoApi = {
@@ -8,10 +8,10 @@ const TodoApi = {
   getToDoDetail: (id: string) => {
     return API.get(`/todos/:${id}`)
   },
-  postCreateToDo: (data: ITodoProps) => {
+  postCreateToDo: (data: ITodoInputProps) => {
     return API.post('/todos', data)
   },
-  postEditToDo: (data: ITodoProps, id: string) => {
+  postEditToDo: (data: ITodoInputProps, id: string) => {
     return API.put(`/todos/${id}`, data)
   },
   deleteTodo: (id: string) => {

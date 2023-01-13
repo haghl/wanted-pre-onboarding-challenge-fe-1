@@ -3,8 +3,8 @@ import { Avatar, Box, Button, createTheme, CssBaseline, TextField, Typography } 
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd'
 import { Container, ThemeProvider } from '@mui/system'
 import { Navigate, useNavigate } from 'react-router-dom'
-import { postSignUp, type UserProp } from '@/api'
 import isLogin from '@/utils/isLogin'
+import UserApi from '@/api/user'
 
 const SignUp = () => {
   const theme = createTheme()
@@ -58,7 +58,7 @@ const SignUp = () => {
   // 회원가입
   const onSubmitSignUp = useCallback(
     async (e: FormEvent<HTMLFormElement>) => {
-      const obj: UserProp = { email: userEmail, password: userPwChk }
+      const obj: ILoginProps = { email: userEmail, password: userPwChk }
       e.preventDefault()
       if (userEmail !== '' && userPw !== '' && userPwChk !== '') {
         if (userEmail === '' || errTxt.email) {
@@ -75,7 +75,7 @@ const SignUp = () => {
         }
 
         try {
-          await postSignUp(obj)
+          await UserApi.postSignUp(obj)
           navigate('/login')
         } catch (err) {
           console.log('회원가입 오류', err)

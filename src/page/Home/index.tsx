@@ -4,29 +4,27 @@ import { Accordion, AccordionDetails, AccordionSummary, AppBar, Box, Button, Con
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import moment from 'moment'
 import ToDoPlus from '@/components/ToDoPlus'
-import { deleteTodo, getToDoList, TodoProp } from '@/api'
+import TodoApi from '@/api/todo'
 
-type TodoListProp = { title: string; content: string; id: string; createdAt: string; updatedAt: string }
-type TodoType = 'plus' | 'edit'
-export type EditProp = TodoProp & { id: string }
+import { ITodoListProps, TodoEditProps, TodoModalType } from '@/types/todo'
 
 const Home = () => {
   const navigate = useNavigate()
   // const listData = useRouteLoaderData('home')
-  const [todoList, setTodoList] = useState<TodoListProp[]>([])
+  const [todoList, setTodoList] = useState<ITodoListProps[]>([])
   const [todoPlus, setTodoPlus] = useState(false)
-  const [todoType, setTodoType] = useState<TodoType>('plus')
-  const [editTodoData, setEditTodoData] = useState<EditProp | null>()
+  const [todoType, setTodoType] = useState<TodoModalType>('plus')
+  const [editTodoData, setEditTodoData] = useState<TodoEditProps | null>()
 
   // 데이터 불러오기 함수
   const getList = useCallback(async () => {
-    const res = await getToDoList()
+    const res = await TodoApi.getToDoList()
     console.log('데이터', res.data.data)
     setTodoList(res.data.data.reverse())
   }, [])
 
   // 수정
-  const onClickEdit = useCallback((data: EditProp) => {
+  const onClickEdit = useCallback((data: TodoEditProps) => {
     setTodoType('edit')
     setEditTodoData(data)
     setTodoPlus(true)
@@ -35,7 +33,7 @@ const Home = () => {
   // 삭제하기
   const onClickDelete = useCallback(async (id: string) => {
     try {
-      await deleteTodo(id)
+      await TodoApi.deleteTodo(id)
       alert('삭제되었습니다.')
       getList()
     } catch (err) {

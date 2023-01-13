@@ -40,5 +40,6 @@ module.exports = {
     'react/jsx-props-no-spreading': 'off',
     'jsx-a11y/label-has-associated-control': 'off',
     'no-plusplus': 'off',
+    '@typescript-eslint/no-use-before-define': 'off',
   },
 }

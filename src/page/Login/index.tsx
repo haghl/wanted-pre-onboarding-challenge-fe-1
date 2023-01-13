@@ -1,73 +1,42 @@
+import { useCallback } from 'react'
 import { Container, ThemeProvider } from '@mui/system'
-import { ChangeEvent, FormEvent, useCallback, useState } from 'react'
+import { useFormik } from 'formik'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { Avatar, Box, Button, createTheme, CssBaseline, Grid, Link, TextField, Typography } from '@mui/material'
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
-import { postLogin, UserProp } from '@/api'
 import isLogin from '@/utils/isLogin'
+import { ILoginProps } from '@/types/user'
+import { loginValidationCheck } from '@/utils/validationChek'
+import UserApi from '@/api/user'
 
 const Login = () => {
   const theme = createTheme()
   const navigate = useNavigate()
-  const [userEmail, setUserEmail] = useState('')
-  const [userPw, setUserPw] = useState('')
-  const [errTxt, setErrTxt] = useState({
-    email: false,
-    pw: false,
-  })
-
-  // 이메일 입력
-  const onChangeEmail = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-    const REG_EMAIL = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/i
-
-    setUserEmail(e.target.value)
-    if (!REG_EMAIL.test(e.target.value) && e.target.value !== '') {
-      setErrTxt((state) => ({ ...state, email: true }))
-    } else {
-      setErrTxt((state) => ({ ...state, email: false }))
-    }
-  }, [])
-
-  // 비밀번호 입력
-  const onChangePw = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-    const REG_PW = /^[a-zA-Z0-9!#@]{8,}$/
-
-    setUserPw(e.target.value)
-    if (!REG_PW.test(e.target.value) && e.target.value !== '') {
-      setErrTxt((state) => ({ ...state, pw: true }))
-    } else {
-      setErrTxt((state) => ({ ...state, pw: false }))
-    }
-  }, [])
 
   // 로그인
-  const onSubmitLogin = useCallback(
-    async (e: FormEvent<HTMLFormElement>) => {
-      const obj: UserProp = { email: userEmail, password: userPw }
-      e.preventDefault()
-      if (userEmail !== '' && userPw !== '') {
-        if (userEmail === '' || errTxt.email) {
-          setErrTxt((state) => ({ ...state, email: true }))
-          return
-        }
-        if (userPw === '' || errTxt.pw) {
-          setErrTxt((state) => ({ ...state, pw: true }))
-          return
-        }
+  const onSubmitLogin = useCallback(async (obj: ILoginProps) => {
+    try {
+      const res = await UserApi.postLogin(obj)
+      console.log('로그인 성공', res.data)
+      localStorage.setItem('accessToken', res.data.token)
 
-        try {
-          const res = await postLogin(obj)
-          console.log('로그인 성공', res.data)
-          localStorage.setItem('accessToken', res.data.token)
+      navigate('/')
+    } catch (err) {
+      console.log('로그인 오류', err)
+    }
+  }, [])
 
-          navigate('/')
-        } catch (err) {
-          console.log('로그인 오류', err)
-        }
-      }
+  // formik
+  const loginFormik = useFormik({
+    initialValues: {
+      email: '',
+      password: '',
     },
-    [userEmail, userPw, errTxt]
-  )
+    validationSchema: loginValidationCheck,
+    onSubmit: (value) => {
+      onSubmitLogin(value)
+    },
+  })
 
   if (isLogin) return <Navigate to="/" />
 
@@ -89,10 +58,10 @@ const Login = () => {
           <Typography component="h1" variant="h5">
             로그인
           </Typography>
-          <Box component="form" onSubmit={onSubmitLogin} noValidate sx={{ mt: 1 }}>
+          <Box component="form" onSubmit={loginFormik.handleSubmit} noValidate sx={{ mt: 1 }}>
             <TextField
               margin="normal"
-              error={errTxt.email}
+              error={loginFormik.touched.email && !!loginFormik.errors.email}
               required
               fullWidth
               id="email"
@@ -100,13 +69,13 @@ const Login = () => {
               name="email"
               autoFocus
               autoComplete="off"
-              value={userEmail}
-              onChange={onChangeEmail}
-              helperText={errTxt.email && '이메일을 확인해주세요.'}
+              value={loginFormik.values.email}
+              onChange={loginFormik.handleChange}
+              helperText={loginFormik.touched.email && loginFormik.errors.email}
             />
             <TextField
               margin="normal"
-              error={errTxt.pw}
+              error={loginFormik.touched.password && !!loginFormik.errors.password}
               required
               fullWidth
               name="password"
@@ -114,9 +83,9 @@ const Login = () => {
               type="password"
               id="password"
               autoComplete="off"
-              value={userPw}
-              onChange={onChangePw}
-              helperText={errTxt.pw && '비밀번호를 확인해주세요.'}
+              value={loginFormik.values.password}
+              onChange={loginFormik.handleChange}
+              helperText={loginFormik.touched.password && loginFormik.errors.password}
             />
             <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
               로그인

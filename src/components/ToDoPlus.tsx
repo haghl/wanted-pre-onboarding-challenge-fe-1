@@ -1,15 +1,8 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Modal, TextField, Button, Grid } from '@mui/material'
 import { Box } from '@mui/system'
-import { postCreateToDo, postEditToDo } from '@/api'
-import { EditProp } from '@/page/Home'
-
-interface ToDoPlusProps {
-  open: boolean
-  onClose: (bool: boolean) => void
-  type: 'plus' | 'edit'
-  editType?: EditProp | null
-}
+import TodoApi from '@/api/todo'
+import { ToDoPlusProps } from '@/types/todo'
 
 const ToDoPlus = ({ open, onClose, type, editType }: ToDoPlusProps) => {
   const [todoType, setTodoType] = useState(type)
@@ -21,7 +14,7 @@ const ToDoPlus = ({ open, onClose, type, editType }: ToDoPlusProps) => {
   const onClickCreate = useCallback(async () => {
     if (title !== '' && contents !== '') {
       try {
-        await postCreateToDo({ title, content: contents })
+        await TodoApi.postCreateToDo({ title, content: contents })
         onClose(false)
       } catch (err) {
         console.log('생성 오류', err)
@@ -31,12 +24,14 @@ const ToDoPlus = ({ open, onClose, type, editType }: ToDoPlusProps) => {
 
   // 수정하기
   const onClickEdit = useCallback(async () => {
-    if (editData?.title !== title || editData?.content !== contents) {
-      try {
-        await postEditToDo({ title, content: contents }, editData!.id)
-        onClose(false)
-      } catch (err) {
-        console.log('수정 오류', err)
+    if (editData) {
+      if (editData?.title !== title || editData?.content !== contents) {
+        try {
+          await TodoApi.postEditToDo({ title, content: contents }, editData?.id)
+          onClose(false)
+        } catch (err) {
+          console.log('수정 오류', err)
+        }
       }
     }
   }, [title, contents])
