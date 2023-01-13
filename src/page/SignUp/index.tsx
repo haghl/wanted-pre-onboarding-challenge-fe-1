@@ -1,89 +1,46 @@
-import { ChangeEvent, FormEvent, useCallback, useState } from 'react'
-import { Avatar, Box, Button, createTheme, CssBaseline, TextField, Typography } from '@mui/material'
-import AssignmentIndIcon from '@mui/icons-material/AssignmentInd'
-import { Container, ThemeProvider } from '@mui/system'
+import { useCallback } from 'react'
+import { useFormik } from 'formik'
 import { Navigate, useNavigate } from 'react-router-dom'
-import isLogin from '@/utils/isLogin'
+
+import { Container, ThemeProvider } from '@mui/system'
+import AssignmentIndIcon from '@mui/icons-material/AssignmentInd'
+import { Avatar, Box, Button, createTheme, CssBaseline, TextField, Typography } from '@mui/material'
+import { toast } from 'react-toastify'
+
 import UserApi from '@/api/user'
+import isLogin from '@/utils/isLogin'
+import { signUpValidationCheck } from '@/utils/validationChek'
+import { ILoginProps } from '@/types/user'
 
 const SignUp = () => {
   const theme = createTheme()
   const navigate = useNavigate()
-  const [userEmail, setUserEmail] = useState('')
-  const [userPw, setUserPw] = useState('')
-  const [userPwChk, setUserPwChk] = useState('')
-  const [errTxt, setErrTxt] = useState({
-    email: false,
-    pw: false,
-    pwChk: false,
-  })
-
-  // 이메일 입력
-  const onChangeEmail = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-    const REG_EMAIL = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/i
-
-    setUserEmail(e.target.value)
-    if (!REG_EMAIL.test(e.target.value) && e.target.value !== '') {
-      setErrTxt((state) => ({ ...state, email: true }))
-    } else {
-      setErrTxt((state) => ({ ...state, email: false }))
-    }
-  }, [])
-
-  // 비밀번호 입력
-  const onChangePw = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-    const REG_PW = /^[a-zA-Z0-9!#@]{8,}$/
-
-    setUserPw(e.target.value)
-    if (!REG_PW.test(e.target.value) && e.target.value !== '') {
-      setErrTxt((state) => ({ ...state, pw: true }))
-    } else {
-      setErrTxt((state) => ({ ...state, pw: false }))
-    }
-  }, [])
-
-  // 비밀번호 확인 입력
-  const onChangePwChk = useCallback(
-    (e: ChangeEvent<HTMLInputElement>) => {
-      setUserPwChk(e.target.value)
-      if (userPw !== e.target.value) {
-        setErrTxt((state) => ({ ...state, pwChk: true }))
-      } else {
-        setErrTxt((state) => ({ ...state, pwChk: false }))
-      }
-    },
-    [userPw]
-  )
 
   // 회원가입
-  const onSubmitSignUp = useCallback(
-    async (e: FormEvent<HTMLFormElement>) => {
-      const obj: ILoginProps = { email: userEmail, password: userPwChk }
-      e.preventDefault()
-      if (userEmail !== '' && userPw !== '' && userPwChk !== '') {
-        if (userEmail === '' || errTxt.email) {
-          setErrTxt((state) => ({ ...state, email: true }))
-          return
-        }
-        if (userPw === '' || errTxt.pw) {
-          setErrTxt((state) => ({ ...state, pw: true }))
-          return
-        }
-        if (userPwChk === '' || errTxt.pwChk) {
-          setErrTxt((state) => ({ ...state, pwChk: true }))
-          return
-        }
+  const onSubmitSignUp = useCallback(async (obj: ILoginProps) => {
+    try {
+      await UserApi.postSignUp(obj)
+      toast('회원가입 성공')
+      navigate('/login')
+    } catch (err) {
+      console.log('회원가입 오류', err)
+      toast(`회원가입 오류 ${err}`)
+    }
+  }, [])
 
-        try {
-          await UserApi.postSignUp(obj)
-          navigate('/login')
-        } catch (err) {
-          console.log('회원가입 오류', err)
-        }
-      }
+  // formik
+  const signUpFormik = useFormik({
+    initialValues: {
+      email: '',
+      password: '',
+      passwordCheck: '',
     },
-    [userEmail, userPw, userPwChk, errTxt]
-  )
+    validationSchema: signUpValidationCheck,
+    onSubmit: (value) => {
+      const params = { email: value.email, password: value.passwordCheck }
+      onSubmitSignUp(params)
+    },
+  })
 
   if (isLogin) return <Navigate to="/" />
   return (
@@ -104,10 +61,10 @@ const SignUp = () => {
           <Typography component="h1" variant="h5">
             회원가입
           </Typography>
-          <Box component="form" onSubmit={onSubmitSignUp} noValidate sx={{ mt: 1 }}>
+          <Box component="form" onSubmit={signUpFormik.handleSubmit} noValidate sx={{ mt: 1 }}>
             <TextField
               margin="normal"
-              error={errTxt.email}
+              error={signUpFormik.touched.email && !!signUpFormik.errors.email}
               required
               fullWidth
               id="email"
@@ -115,13 +72,13 @@ const SignUp = () => {
               name="email"
               autoFocus
               autoComplete="off"
-              value={userEmail}
-              onChange={onChangeEmail}
-              helperText={errTxt.email && '이메일을 확인해주세요.'}
+              value={signUpFormik.values.email}
+              onChange={signUpFormik.handleChange}
+              helperText={signUpFormik.touched.email && signUpFormik.errors.email}
             />
             <TextField
               margin="normal"
-              error={errTxt.pw}
+              error={signUpFormik.touched.password && !!signUpFormik.errors.password}
               required
               fullWidth
               name="password"
@@ -129,23 +86,23 @@ const SignUp = () => {
               type="password"
               id="password"
               autoComplete="off"
-              value={userPw}
-              onChange={onChangePw}
-              helperText={errTxt.pw && '비밀번호를 확인해주세요.'}
+              value={signUpFormik.values.password}
+              onChange={signUpFormik.handleChange}
+              helperText={signUpFormik.touched.password && signUpFormik.errors.password}
             />
             <TextField
               margin="normal"
-              error={errTxt.pwChk}
+              error={signUpFormik.touched.passwordCheck && !!signUpFormik.errors.passwordCheck}
               required
               fullWidth
-              name="passwordChk"
+              name="passwordCheck"
               label="비밀번호 확인"
               type="password"
-              id="passwordChk"
+              id="passwordCheck"
               autoComplete="off"
-              value={userPwChk}
-              onChange={onChangePwChk}
-              helperText={errTxt.pwChk && '비밀번호가 다릅니다.'}
+              value={signUpFormik.values.passwordCheck}
+              onChange={signUpFormik.handleChange}
+              helperText={signUpFormik.touched.passwordCheck && signUpFormik.errors.passwordCheck}
             />
             <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
               회원가입

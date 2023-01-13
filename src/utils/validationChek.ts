@@ -7,7 +7,7 @@ const loginVali = {
 
 export const loginValidationCheck = yup.object(loginVali)
 
-export const signValidationCheck = yup.object({
+export const signUpValidationCheck = yup.object({
   ...loginVali,
   passwordCheck: yup
     .string()

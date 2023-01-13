@@ -49,7 +49,11 @@ const Home = () => {
 
   // 마운트 시 데이터 불러오기
   useEffect(() => {
-    if (!todoPlus) getList()
+    if (!todoPlus) {
+      console.log('실행')
+
+      getList()
+    }
     // console.log(listData)
   }, [todoPlus])
 

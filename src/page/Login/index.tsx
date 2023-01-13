@@ -17,7 +17,7 @@ const Login = () => {
   const onSubmitLogin = useCallback(async (obj: ILoginProps) => {
     try {
       const res = await UserApi.postLogin(obj)
-      console.log('로그인 성공', res.data)
+      console.log('로그인 성공', res.data.token)
       localStorage.setItem('accessToken', res.data.token)
 
       navigate('/')

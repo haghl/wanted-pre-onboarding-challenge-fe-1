@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { toast } from 'react-toastify'
 import router from '@/router/router'
 
 // API 인스턴스 생성
@@ -11,8 +12,9 @@ API.interceptors.request.use(
   (config) => {
     const accessToken = localStorage.getItem('accessToken')
     const data = config
+    console.log('accessToken', accessToken)
 
-    if (accessToken || accessToken !== 'undefined') {
+    if (!accessToken || accessToken === 'undefined') {
       // eslint-disable-next-line no-param-reassign
       data.headers = {
         Accept: '*/*',
@@ -37,11 +39,14 @@ API.interceptors.request.use(
 
 API.interceptors.response.use(
   (res) => {
-    return res.data
+    return res
   },
   (err) => {
-    alert(`오류발생! ${err.response.data.details}`)
-    if (err.response.status === 400) router.navigate('/login', { replace: true })
+    toast(`오류발생! ${err.response.data.details}`)
+    if (err.response.status === 400) {
+      localStorage.removeItem('accessToken')
+      router.navigate('/login', { replace: true })
+    }
     return Promise.reject(err)
   }
 )
