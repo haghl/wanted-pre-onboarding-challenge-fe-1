@@ -15,7 +15,7 @@ const Header = ({ onClickBtn }: IHeaderProps) => {
   // 로그 아웃
   const onClickLogOut = useCallback(() => {
     localStorage.removeItem('accessToken')
-    navigate('/login')
+    navigate('/login', { replace: true })
   }, [])
 
   useEffect(() => {
@@ -25,9 +25,11 @@ const Header = ({ onClickBtn }: IHeaderProps) => {
   return (
     <AppBar position="static" component="nav">
       <Toolbar>
-        <Typography variant="h6" component="div" sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' }, cursor: 'pointer' }} onClick={() => navigate('/')}>
-          원동규의 TODO
-        </Typography>
+        <Box component="div" sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}>
+          <Typography variant="h6" sx={{ width: 'fit-content', cursor: 'pointer' }} onClick={() => navigate('/')}>
+            원동규의 TODO
+          </Typography>
+        </Box>
         <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
           <Button color="inherit" onClick={onClickBtn}>
             {headerType === 'plus' ? '생성' : '수정'}

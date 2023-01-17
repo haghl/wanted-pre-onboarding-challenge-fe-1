@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { toast } from 'react-toastify'
 import { useSelector } from 'react-redux'
 import { Modal, TextField, Button, Grid } from '@mui/material'
 import { Box } from '@mui/system'
@@ -10,13 +11,13 @@ const ToDoPlus = ({ open, onClose, editType }: ToDoPlusProps) => {
   const headerType = useSelector((state: RootState) => state.headerSlice.headerType)
   const [title, setTitle] = useState('')
   const [contents, setContents] = useState('')
-  const [editData, setEditData] = useState(editType)
 
   // 클릭
   const onClickCreate = useCallback(async () => {
     if (title !== '' && contents !== '') {
       try {
         await TodoApi.postCreateToDo({ title, content: contents })
+        toast('todo가 생성되었습니다!')
         onClose(false)
       } catch (err) {
         console.log('생성 오류', err)
@@ -26,10 +27,11 @@ const ToDoPlus = ({ open, onClose, editType }: ToDoPlusProps) => {
 
   // 수정하기
   const onClickEdit = useCallback(async () => {
-    if (editData) {
-      if (editData?.title !== title || editData?.content !== contents) {
+    if (editType) {
+      if (editType?.title !== title || editType?.content !== contents) {
         try {
-          await TodoApi.postEditToDo({ title, content: contents }, editData?.id)
+          await TodoApi.postEditToDo({ title, content: contents }, editType?.id)
+          toast('todo가 수정되었습니다!')
           onClose(false)
         } catch (err) {
           console.log('수정 오류', err)
@@ -39,9 +41,9 @@ const ToDoPlus = ({ open, onClose, editType }: ToDoPlusProps) => {
   }, [title, contents])
 
   useEffect(() => {
-    if (editData && headerType === 'edit') {
-      setTitle(editData?.title)
-      setContents(editData?.content)
+    if (editType && headerType === 'edit') {
+      setTitle(editType?.title)
+      setContents(editType?.content)
     }
   }, [])
 
