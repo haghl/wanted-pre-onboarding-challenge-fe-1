@@ -25,12 +25,12 @@ const Header = ({ onClickBtn }: IHeaderProps) => {
   return (
     <AppBar position="static" component="nav">
       <Toolbar>
-        <Typography variant="h6" component="div" sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}>
+        <Typography variant="h6" component="div" sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' }, cursor: 'pointer' }} onClick={() => navigate('/')}>
           원동규의 TODO
         </Typography>
         <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
           <Button color="inherit" onClick={onClickBtn}>
-            생성
+            {headerType === 'plus' ? '생성' : '수정'}
           </Button>
 
           <Button color="inherit" onClick={onClickLogOut}>

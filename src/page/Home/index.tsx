@@ -19,17 +19,6 @@ const Home = () => {
     setTodoList(res.data.data.reverse())
   }, [])
 
-  // 삭제하기
-  const onClickDelete = useCallback(async (id: string) => {
-    try {
-      await TodoApi.deleteTodo(id)
-      alert('삭제되었습니다.')
-      getList()
-    } catch (err) {
-      console.log('수정 오류', err)
-    }
-  }, [])
-
   // 마운트 시 데이터 불러오기
   useEffect(() => {
     if (!todoPlus) {

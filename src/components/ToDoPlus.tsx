@@ -40,8 +40,6 @@ const ToDoPlus = ({ open, onClose, editType }: ToDoPlusProps) => {
 
   useEffect(() => {
     if (editData && headerType === 'edit') {
-      console.log(editData)
-
       setTitle(editData?.title)
       setContents(editData?.content)
     }
@@ -65,8 +63,8 @@ const ToDoPlus = ({ open, onClose, editType }: ToDoPlusProps) => {
         <TextField margin="normal" fullWidth id="title" label="ToDo 제목" name="title" autoFocus autoComplete="off" value={title} onChange={(e) => setTitle(e.target.value)} />
         <TextField margin="normal" fullWidth id="contents" label="ToDo 내용" name="contents" multiline autoComplete="off" value={contents} onChange={(e) => setContents(e.target.value)} />
         <Grid container justifyContent="center" alignItems="center">
-          <Button variant="contained" onClick={todoType === 'plus' ? onClickCreate : onClickEdit}>
-            {todoType === 'plus' ? '생성' : '수정'}
+          <Button variant="contained" onClick={headerType === 'plus' ? onClickCreate : onClickEdit}>
+            {headerType === 'plus' ? '생성' : '수정'}
           </Button>
         </Grid>
       </Box>
