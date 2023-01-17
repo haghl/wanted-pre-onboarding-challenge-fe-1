@@ -14,7 +14,6 @@ export interface ITodoListProps {
 export interface ToDoPlusProps {
   open: boolean
   onClose: (bool: boolean) => void
-  type: 'plus' | 'edit'
   editType?: TodoEditProps
 }
 

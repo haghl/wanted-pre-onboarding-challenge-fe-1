@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useState } from 'react'
+import { useSelector } from 'react-redux'
 import { Modal, TextField, Button, Grid } from '@mui/material'
 import { Box } from '@mui/system'
+import { RootState } from '@/store/store'
 import TodoApi from '@/api/todo'
 import { ToDoPlusProps } from '@/types/todo'
 
-const ToDoPlus = ({ open, onClose, type, editType }: ToDoPlusProps) => {
-  const [todoType, setTodoType] = useState(type)
+const ToDoPlus = ({ open, onClose, editType }: ToDoPlusProps) => {
+  const headerType = useSelector((state: RootState) => state.headerSlice.headerType)
   const [title, setTitle] = useState('')
   const [contents, setContents] = useState('')
   const [editData, setEditData] = useState(editType)
@@ -37,16 +39,11 @@ const ToDoPlus = ({ open, onClose, type, editType }: ToDoPlusProps) => {
   }, [title, contents])
 
   useEffect(() => {
-    if (editData && type === 'edit') {
+    if (editData && headerType === 'edit') {
       console.log(editData)
 
       setTitle(editData?.title)
       setContents(editData?.content)
-    }
-
-    return () => {
-      setTodoType('plus')
-      setEditData(undefined)
     }
   }, [])
 

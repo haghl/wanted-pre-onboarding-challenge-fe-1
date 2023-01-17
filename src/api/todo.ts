@@ -6,7 +6,7 @@ const TodoApi = {
     return API.get('/todos')
   },
   getToDoDetail: (id: string) => {
-    return API.get(`/todos/:${id}`)
+    return API.get(`/todos/${id}`)
   },
   postCreateToDo: (data: ITodoInputProps) => {
     return API.post('/todos', data)
