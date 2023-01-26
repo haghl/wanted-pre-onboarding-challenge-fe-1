@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react'
+import { useCallback } from 'react'
 import { AppBar, Toolbar, Typography, Box, Button } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
@@ -17,10 +17,6 @@ const Header = ({ onClickBtn }: IHeaderProps) => {
     localStorage.removeItem('accessToken')
     navigate('/login', { replace: true })
   }, [])
-
-  useEffect(() => {
-    console.log(headerType)
-  }, [headerType])
 
   return (
     <AppBar position="static" component="nav">

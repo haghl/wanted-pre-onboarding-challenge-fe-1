@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { useQueryClient } from 'react-query'
 import { toast } from 'react-toastify'
 import { useSelector } from 'react-redux'
 import { Modal, TextField, Button, Grid } from '@mui/material'
@@ -6,22 +7,22 @@ import { Box } from '@mui/system'
 import { RootState } from '@/store/store'
 import TodoApi from '@/api/todo'
 import { ToDoPlusProps } from '@/types/todo'
+import useCreateTodo from '@/hook/mutation/useCreateTodo'
+import useEditTodo from '@/hook/mutation/useEditTodo'
 
 const ToDoPlus = ({ open, onClose, editType }: ToDoPlusProps) => {
   const headerType = useSelector((state: RootState) => state.headerSlice.headerType)
+  const queryClient = useQueryClient()
   const [title, setTitle] = useState('')
   const [contents, setContents] = useState('')
+  const { mutate: createTodo } = useCreateTodo()
+  const { mutate: editTodo } = useEditTodo()
 
   // 클릭
-  const onClickCreate = useCallback(async () => {
+  const onClickCreate = useCallback(() => {
     if (title !== '' && contents !== '') {
-      try {
-        await TodoApi.postCreateToDo({ title, content: contents })
-        toast('todo가 생성되었습니다!')
-        onClose(false)
-      } catch (err) {
-        console.log('생성 오류', err)
-      }
+      createTodo({ title, content: contents })
+      onClose(false)
     }
   }, [title, contents])
 
@@ -29,21 +30,19 @@ const ToDoPlus = ({ open, onClose, editType }: ToDoPlusProps) => {
   const onClickEdit = useCallback(async () => {
     if (editType) {
       if (editType?.title !== title || editType?.content !== contents) {
-        try {
-          await TodoApi.postEditToDo({ title, content: contents }, editType?.id)
-          toast('todo가 수정되었습니다!')
-          onClose(false)
-        } catch (err) {
-          console.log('수정 오류', err)
-        }
+        editTodo({ title, content: contents, id: editType.id })
+        onClose(false)
       }
     }
   }, [title, contents])
 
   useEffect(() => {
     if (editType && headerType === 'edit') {
-      setTitle(editType?.title)
-      setContents(editType?.content)
+      setTitle(editType.title)
+      setContents(editType.content)
+    }
+    return () => {
+      queryClient.invalidateQueries(['getToDos'])
     }
   }, [])
 

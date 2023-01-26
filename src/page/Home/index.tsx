@@ -6,27 +6,19 @@ import TodoApi from '@/api/todo'
 
 import { ITodoListProps } from '@/types/todo'
 import Header from '@/layout/Header'
+import useGetToDos from '@/hook/query/useGetToDos'
 
 const Home = () => {
   const navigate = useNavigate()
-  const [todoList, setTodoList] = useState<ITodoListProps[]>([])
+  const { isLoading, data } = useGetToDos()
   const [todoPlus, setTodoPlus] = useState(false)
+  const [todoList, setTodoList] = useState<ITodoListProps[]>()
 
-  // 데이터 불러오기 함수
-  const getList = useCallback(async () => {
-    const res = await TodoApi.getToDoList()
-    console.log('데이터', res.data.data)
-    setTodoList(res.data.data.reverse())
-  }, [])
-
-  // 마운트 시 데이터 불러오기
   useEffect(() => {
-    if (!todoPlus) {
-      console.log('실행')
+    if (data) setTodoList(data)
+  }, [data])
 
-      getList()
-    }
-  }, [todoPlus])
+  if (isLoading) return <div>로딩중...</div>
 
   return (
     <>
@@ -36,7 +28,7 @@ const Home = () => {
         <Container component="main" sx={{ mb: 4 }}>
           <Box>
             <List dense sx={{ width: '100%', margin: '5px auto 0', bgcolor: 'background.paper' }}>
-              {todoList.length > 0 ? (
+              {todoList && todoList.length > 0 ? (
                 todoList.map((x) => {
                   return (
                     <ListItemButton key={x.id} sx={{ width: '100%', minHeight: 50, borderBottom: '1px solid grey' }} onClick={() => navigate(`/${x.id}`)}>

@@ -1,4 +1,4 @@
-import { ITodoInputProps } from '@/types/todo'
+import { ITodoInputProps, TodoEditProps } from '@/types/todo'
 import API from '@/utils/API'
 
 const TodoApi = {
@@ -11,8 +11,9 @@ const TodoApi = {
   postCreateToDo: (data: ITodoInputProps) => {
     return API.post('/todos', data)
   },
-  postEditToDo: (data: ITodoInputProps, id: string) => {
-    return API.put(`/todos/${id}`, data)
+  postEditToDo: (todo: TodoEditProps) => {
+    const { id, title, content } = todo
+    return API.put(`/todos/${id}`, { title, content })
   },
   deleteTodo: (id: string) => {
     return API.delete(`/todos/${id}`)

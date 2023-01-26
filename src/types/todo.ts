@@ -20,3 +20,7 @@ export interface ToDoPlusProps {
 export type TodoModalType = 'plus' | 'edit'
 
 export type TodoEditProps = ITodoInputProps & { id: string }
+
+export interface ITodoListPropsResponse {
+  data: ITodoListProps[]
+}

@@ -42,7 +42,7 @@ const SignUp = () => {
     },
   })
 
-  if (isLogin) return <Navigate to="/" />
+  if (isLogin()) return <Navigate to="/" />
   return (
     <ThemeProvider theme={theme}>
       <Container component="main" maxWidth="xs">

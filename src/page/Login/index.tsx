@@ -38,7 +38,7 @@ const Login = () => {
     },
   })
 
-  if (isLogin) return <Navigate to="/" />
+  if (isLogin()) return <Navigate to="/" />
 
   return (
     <ThemeProvider theme={theme}>

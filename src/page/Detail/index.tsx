@@ -1,52 +1,42 @@
 import { useCallback, useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
-import { toast } from 'react-toastify'
 import { Button, CssBaseline, Divider, Grid, Typography } from '@mui/material'
 import { Box } from '@mui/system'
-import TodoApi from '@/api/todo'
 import { ITodoListProps } from '@/types/todo'
 import Header from '@/layout/Header'
 import headerSlice from '@/store/Slices/Header'
 import ToDoPlus from '@/components/ToDoPlus'
+import useGetToDoDetail from '@/hook/query/useGetToDoDetail'
+import useDeleteTodo from '@/hook/mutation/useDeleteTodo'
 
 const Detail = () => {
-  const navigate = useNavigate()
-  const detailId = useParams().id
+  const { id: detailId } = useParams()
+  const id = detailId || 'undefined'
   const dispatch = useDispatch()
   const [detailData, setDetailData] = useState<ITodoListProps>()
   const [todoPlus, setTodoPlus] = useState(false)
-
-  // 데이터 불러오기
-  const getDetailData = async () => {
-    if (detailId) {
-      const response = await TodoApi.getToDoDetail(detailId)
-      console.log(response.data.data)
-      setDetailData(response.data.data)
-    }
-  }
+  const { isLoading, data } = useGetToDoDetail(id)
+  const { mutate: deleteDetail } = useDeleteTodo()
 
   // 삭제하기
-  const onClickDelete = useCallback(async () => {
-    try {
-      if (detailId) {
-        await TodoApi.deleteTodo(detailId)
-        toast('삭제되었습니다.')
-        navigate('/', { replace: true })
-      }
-    } catch (err) {
-      console.log('수정 오류', err)
-    }
+  const onClickDelete = useCallback(() => {
+    deleteDetail(id)
   }, [])
 
   useEffect(() => {
     dispatch(headerSlice.actions.setChangeHeaderType('edit'))
-    getDetailData()
 
     return () => {
       dispatch(headerSlice.actions.setChangeHeaderType('plus'))
     }
   }, [])
+
+  useEffect(() => {
+    if (data) setDetailData(data.data.data)
+  }, [data])
+
+  if (isLoading) return <div>로딩중...</div>
 
   return (
     <>
@@ -72,7 +62,6 @@ const Detail = () => {
           open={todoPlus}
           onClose={() => {
             setTodoPlus(false)
-            getDetailData()
           }}
           editType={detailData}
         />
